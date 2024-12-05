@@ -11,6 +11,7 @@ val deps: Map[Int, List[Int]] = lines.takeWhile(!_.isBlank).map(d =>
 			case None => Some(List(dep._1))
 	)
 ) 
+
 val updates = lines.map(_.split(",").map(_.toInt).toList).toList
 
 def isGood(update: List[Int]): Boolean =
@@ -30,7 +31,7 @@ updates.map(update =>
 ).sum
 
 // PART 2
-val noGood = updates.filter(!isGood(_)).toList
+val noGood = updates.filter(!isGood(_))
 
 noGood.map(update =>
 	// A < B <=> page A can be before B, i.e no rules say that B is a dependancy of A
