@@ -1,0 +1,1 @@
+do()mul(5,2)don't()mul(10,10)do()mul(1,1)
