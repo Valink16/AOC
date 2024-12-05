@@ -36,6 +36,6 @@ val noGood = updates.filter(!isGood(_))
 noGood.map(update =>
 	// A < B <=> page A can be before B, i.e no rules say that B is a dependancy of A
 	update.sortWith((a, b) =>
-		deps.getOrElse(b, List.empty).contains(a)
+		!deps.getOrElse(a, List.empty).contains(b)
 	)
 ).map(update => update(update.length / 2)).sum
