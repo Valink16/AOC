@@ -3,53 +3,34 @@ enum Op:
 	case Mul
 	case Concat
 
-extension (op: Op)
-	def apply(a: Long, b: Long) = op match
-		case Op.Add => a + b
-		case Op.Mul => a * b
-		case Op.Concat => (a.toString ++ b.toString).toLong
+val Part1Ops = Seq(Op.Add, Op.Mul)
+val Part2Ops = Seq(Op.Add, Op.Mul, Op.Concat)
 
-case class OpGen(opCount: Int) extends Iterator[Seq[Op]]:
-	var current = (0 until opCount).map(_ => Op.Add).toArray
-	var permutationIndex = 0
-	val max = scala.math.pow(3d, opCount).toLong 
-	def hasNext = permutationIndex < max
-	def next() =
-		permutationIndex = permutationIndex + 1
-		val r = current.toSeq
-		var currentIndex = current.length - 1
-		while currentIndex >= 0 do
-			val next = current(currentIndex) match
-				case Op.Add => Op.Mul
-				case Op.Mul => Op.Concat
-				case Op.Concat => Op.Add
-			
-			current.update(currentIndex, next)
-			if next != Op.Add then // We have no "overflow"
-				return r	
-			else
-				currentIndex = currentIndex - 1
-		r
-
-def crunch(numbers: Seq[Long], ops: Seq[Op]) =
-	numbers.tail
-		.zip(ops)
-		.foldLeft(numbers.head)(
-			(r, op) => op._2.apply(r, op._1)
+// Recursive version using idea from
+// https://github.com/OzairFaizan/AdventOfCode/tree/502275793b30d2c864c3cd03f77059b7e9f4125c/2024/day07
+def isTargetable(numbers: Seq[Long], ops: Seq[Op], target: Long) =
+	def aux(revNumbers: List[Long], target: Long): Boolean = revNumbers match
+		case Nil => false
+		case head :: Nil => head == target
+		case head :: tail => ops.exists(op =>
+			val (targetStr, headStr) = (target.toString, head.toString)
+			op match
+				case Op.Add if target - head >= 0 => aux(tail, target - head)
+				case Op.Mul if target % head == 0 => aux(tail, target / head)
+				case Op.Concat if targetStr.length - headStr.length > 0 && targetStr.endsWith(headStr) =>
+					aux(tail, targetStr.dropRight(head.toString.length).toLong)
+				case _ => false
 		)
 
-def exaustiveSearch(numbers: Seq[Long], target: Long) =
-	OpGen(numbers.length - 1).find(ops => crunch(numbers, ops) == target)
+	aux(numbers.reverse.toList, target)
 
 scala.io.Source.fromFile("inputs/day7.txt").getLines()
 	.map(l =>
 		val split = l.split(": ")
 		val target = split(0).toLong
 		val numbers = split(1).split(" ").map(_.toLong)
-		(numbers, target)
-	)
-	.filter((nbs, tgt) => exaustiveSearch(nbs.toIndexedSeq, tgt).isDefined)
+		(numbers.toList, target)
+	).toList
+	.filter((numbers, target) => isTargetable(numbers.toSeq, Part2Ops, target))
 	.map(_._2)
 	.sum
-
-// exaustiveSearch(nbs, 3267)
