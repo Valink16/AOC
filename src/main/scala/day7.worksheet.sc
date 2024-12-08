@@ -18,7 +18,7 @@ def isTargetable(numbers: Seq[Long], ops: Seq[Op], target: Long) =
 				case Op.Add if target - head >= 0 => aux(tail, target - head)
 				case Op.Mul if target % head == 0 => aux(tail, target / head)
 				case Op.Concat if targetStr.length - headStr.length > 0 && targetStr.endsWith(headStr) =>
-					aux(tail, targetStr.dropRight(head.toString.length).toLong)
+					aux(tail, targetStr.dropRight(headStr.length).toLong)
 				case _ => false
 		)
 

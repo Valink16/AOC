@@ -1,5 +1,4 @@
-import scala.concurrent.ExecutionContext.parasitic
-import scala.reflect.internal.util.Position
+import scala.annotation.tailrec
 case class Vec(x: Int, y: Int)
 
 val lines = scala.io.Source.fromFile("inputs/day8.txt")
@@ -25,8 +24,11 @@ def part1AN(first: Vec, second: Vec) =
 	)
 
 def advanceInBounds(start: Vec, delta: Vec, w: Int, h: Int): List[Vec] =
-	if start.x < 0 || start.x >= w || start.y < 0 || start.y >= h then Nil
-	else start :: advanceInBounds(Vec(start.x + delta.x, start.y + delta.y), delta, w, h)
+	@tailrec
+	def aux(acc: List[Vec], start: Vec, delta: Vec): List[Vec] =
+		if start.x < 0 || start.x >= w || start.y < 0 || start.y >= h then acc
+		else aux(start :: acc, Vec(start.x + delta.x, start.y + delta.y), delta)
+	aux(List.empty, start, delta)
 
 def part2AN(first: Vec, second: Vec) =
 	val delta = Vec(second.x - first.x, second.y - first.y)
@@ -42,5 +44,5 @@ radarPositions
 				case first :: second :: _ => part2AN(first, second)
 				case _ => throw Exception("Unreachable since we use combinations of 2")
 		)
-	).filter(pos => pos.x >= 0 && pos.x < w && pos.y >= 0 && pos.y < h)
+	).filter(pos => pos.x >= 0 && pos.x < w && pos.y >= 0 && pos.y < h) // Useless if using part2AN
 	.toSet.size // Check for bounds
