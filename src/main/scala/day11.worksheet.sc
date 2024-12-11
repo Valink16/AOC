@@ -6,7 +6,7 @@ val stones = io.Source.fromFile("inputs/day11.txt").getLines.next
 import collection.mutable.Map
 def countStones(stone: Long, steps: Int, cache: Vector[Map[Long, Long]]): Long =
 	cache(steps).get(stone) match
-		case Some(value) => return cache(steps).get(stone).get
+		case Some(value) => return value
 		case _ =>
 			val r = if steps == 0 then 1
 			else
