@@ -63,7 +63,11 @@ def dfsSides(g: Array[Array[Vertex]], from: Vec): Res =
 	// TOP or RIGHT => no corner on the top right
 	// BOTTOM or RIGHT => no corner on the bottom right
 	// BOTTOM or LEFT => no corner on the bottom left
-	// TOP or LEFT => no corner on the top left
+	// TOP or LEFT => no corner on the top left ==> De Morgan for when there is a corner
+	// TOP, RIGHT and !TOP RIGHT => inner corner on the top right
+	// TOP, LEFT and !TOP LEFT => inner corner on the top left
+	// BOTTOM, RIGHT and !BOTTOM RIGHT => inner corner on the bottom right
+	// BOTTOM, LEFT and !BOTTOM LEFT => inner corner on the bottom left	
 	val corners = Seq(
 		!top && !right,
 		!bottom && !right,
